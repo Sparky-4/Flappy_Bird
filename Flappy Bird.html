@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link href='https://fonts.googleapis.com/css?family=Electrolize' rel='stylesheet'>
+	<link href='https://fonts.googleapis.com/css?family=Press+Start+2P' rel='stylesheet'>
+
+	<style>
+	body{
+		font-family: 'Electrolize';font-size: 22px;
+		font-family: 'Press Start 2P';font-size: 22px;
+		overflow: hidden;
+		margin: 0px;
+	}
+		
+	</style>
+
+</head>
+<body onLoad = "load()">
+
+	<canvas id="myCanvas"></canvas>
+	<h1 id = "h1"></h1>
+	<h2 id = "h2"></h2>
+
+	<script>
+	var canvas = document.getElementById("myCanvas")
+	var ctx = canvas.getContext("2d")
+	
+	var background = new Image()
+	background.src = "Images/background.png"
+	let backgroundScroll = 0;
+	
+	var foreground = new Image()
+	foreground.src = "Images/foreground.png"
+	let groundScroll = 0;
+	
+	var BACKGROUND_SCROLL_SPEED = 0;
+	const GROUND_SCROLL_SPEED = 4;
+	const PIPE_HEIGHT = 793;
+	const PIPE_WIDTH = 138;
+	
+	let spawnTimer = 0;
+	let scrolling = true;
+	let score = 0;
+	let highScore = localStorage.getItem("highScoreFlappy");
+	let inv = false;
+	let qinv = false;
+	let code = "";
+	let scoreEnabled = true;
+
+	function load()
+	{
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+		
+		groundY = canvas.height * 9/10;
+		gravity = canvas.height / 1500;
+		
+		bird = new Bird();
+		pipeList = [];
+		stateMachine = new StateMachine();
+		
+		let temp = canvas.height / background.height;
+		background.width *= temp;
+		background.height *= temp;
+		backgroundLoopingPoint = 1496 * temp;
+		BACKGROUND_SCROLL_SPEED = temp;
+		
+		temp = canvas.height / foreground.height / 10;
+		foreground.width *= temp;
+		foreground.height *= temp;
+		
+		sounds();
+		addEventListener("keydown", keyPush);
+		requestAnimationFrame(update);
+	}
+	
+	function sounds()
+	{
+		hit = document.createElement("AUDIO");
+		hit.src = "Sounds/hit.mp3";
+		
+		point = document.createElement("AUDIO");
+		point.src = "Sounds/point.mp3";
+		
+		wing = document.createElement("AUDIO");
+		wing.src = "Sounds/wing.mp3";
+		wing.load();
+		
+		music = document.createElement("AUDIO");
+		music.src = "Sounds/music.mp3";
+		music.loop = true;
+		music.load();
+		
+	}
+
+	function update()
+	{
+		if(scrolling)
+		{
+			backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED) % backgroundLoopingPoint;
+			groundScroll = (groundScroll + GROUND_SCROLL_SPEED) % 2000;
+		}
+		
+		stateMachine.update();
+		
+		requestAnimationFrame(update);
+	}
+	
+	function keyPush(evt)
+	{
+		switch(evt.keyCode)
+		{
+			case 38:
+				if(bird.isAlive)
+				{
+					bird.yVel = -Math.floor(canvas.height/75);
+					wing.load();
+					wing.play()
+				}				
+				break
+				
+			case 32:
+				if(bird.isAlive)
+				{
+					bird.yVel = -Math.floor(canvas.height/75);
+					wing.load();
+					wing.play()
+				}		
+				break
+				
+			case 13:	 
+				stateMachine.change();
+				music.play();
+				break
+				
+			case 78:	 
+				if(inv){inv = false}
+				else{inv = true}
+				break
+				
+			case 80:
+				if(music.paused)
+					music.play();
+				else
+					music.pause();
+				break
+				
+		}	
+		
+		code += evt.key
+		if(code.includes("lookup"))
+		{
+			scoreEnabled = false;
+			qinv = true;
+		}
+			
+	}
+	
+	</script>	
+	<script src = "Bird.js"></script>
+	<script src = "Pipe.js"></script>
+	<script src = "pipePair.js"></script>
+	<script src = "StateMachine.js"></script>
+</body>
+</html>
