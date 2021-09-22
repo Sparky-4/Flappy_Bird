@@ -42,7 +42,7 @@
 	let spawnTimer = 0;
 	let scrolling = true;
 	let score = 0;
-	let highScore = localStorage.getItem("highScoreFlappy");
+	let highScore = 0;
 	let inv = false;
 	let qinv = false;
 	let code = "";
@@ -70,6 +70,9 @@
 		foreground.width *= temp;
 		foreground.height *= temp;
 		
+		if(localStorage.getItem("highScoreFlappy"))
+			highScore = localStorage.getItem("highScoreFlappy");
+
 		sounds();
 		addEventListener("keydown", keyPush);
 		requestAnimationFrame(update);
